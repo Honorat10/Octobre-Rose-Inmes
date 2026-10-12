@@ -7,11 +7,11 @@
   <meta name="description" content="Créez et téléchargez votre affiche personnalisée « J'y serai et toi ? » pour la campagne Octobre Rose organisée par l'INMES au Marché Ganhi les 23 et 24 Octobre 2026.">
   <link rel="icon" type="image/png" href="assets/logo_inmes.png">
   
-  <!-- Prevent FOUC theme flash -->
+  <!-- Prevent FOUC theme flash (default: light / white) -->
   <script>
     (function() {
       const savedTheme = localStorage.getItem('preferred-theme');
-      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      if (savedTheme === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
       } else {
         document.documentElement.setAttribute('data-theme', 'light');
