@@ -1272,21 +1272,28 @@
     let bgLoaded = false;
     let overlayLoaded = false;
 
-    imgBg.src = 'assets/template_bg.png?v=2';
-    imgOverlay.src = 'assets/template_overlay.png?v=2';
+    imgBg.src = 'assets/template_bg.png?v=3';
+    imgOverlay.src = 'assets/template_overlay.png?v=3';
 
     imgBg.onload = () => { bgLoaded = true; render(); };
     imgOverlay.onload = () => { overlayLoaded = true; render(); };
 
     // Photo window configuration in 1600x1600 canvas
-    // Tnzw geometry: center around (755, 755), width ~1198, height ~1198, tilted 6deg
+    // Tnzw geometry from PixelLab:
+    // shape2: x=88, y=92, w=527.08, h=527.08, rot=-6deg
+    // cx = (88 + 527.08 / 2) * (1600 / 704) = 799
+    // cy = (92 + 527.08 / 2) * (1600 / 704) = 808
+    // w = 527.08 * (1600 / 704) = 1198
+    // h = 527.08 * (1600 / 704) = 1198
+    // radius = 105
+    // tilt = -6 * Math.PI / 180 (-6 degrees counter-clockwise in Canvas)
     const FRAME_CONFIG = {
-      cx: 755,
-      cy: 755,
+      cx: 799,
+      cy: 808,
       w: 1198,
       h: 1198,
-      radius: 100,
-      tilt: 6 * Math.PI / 180 // 6 degrees
+      radius: 105,
+      tilt: -6 * Math.PI / 180
     };
 
     // Load sample photo
@@ -1357,7 +1364,7 @@
         // Apply Filter
         applyCanvasFilter(ctx, state.filter);
 
-        // Draw image centered
+        // Draw image
         const iw = state.userImg.width;
         const ih = state.userImg.height;
         // Fit proportionally inside card
@@ -1365,7 +1372,11 @@
         const dw = iw * fitScale;
         const dh = ih * fitScale;
 
-        ctx.drawImage(state.userImg, -dw / 2, -dh / 2, dw, dh);
+        // Smart portrait framing: when image is taller than the card,
+        // anchor comfortably near top so face, head & shoulders are visible naturally (PixelLab style)
+        const defaultOffsetY = (dh > FRAME_CONFIG.h) ? (dh - FRAME_CONFIG.h) * 0.45 : 0;
+
+        ctx.drawImage(state.userImg, -dw / 2, -dh / 2 + defaultOffsetY, dw, dh);
       } else {
         // Empty state: elegant placeholder illustration inside the white card
         drawEmptyPlaceholder(ctx, hw, hh);

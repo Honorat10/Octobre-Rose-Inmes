@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Test imgly Background Removal</title>
+</head>
+<body style="background: #222; color: #fff; font-family: sans-serif; padding: 20px;">
+  <h2>Testing @imgly/background-removal</h2>
+  <div id="status">Loading module...</div>
+  <div style="display: flex; gap: 20px; margin-top: 20px;">
+    <div>
+      <h3>Original</h3>
+      <img id="origImg" src="assets/sample_photo.jpg" style="max-width: 300px;">
+    </div>
+    <div>
+      <h3>Result (@imgly on pink)</h3>
+      <div style="background: #ea489b; padding: 10px; display: inline-block;">
+        <img id="resultImg" style="max-width: 300px;">
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    const statusDiv = document.getElementById('status');
+    const resultImg = document.getElementById('resultImg');
+
+    try {
+      statusDiv.textContent = 'Importing removeBackground...';
+      const { removeBackground } = await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/+esm');
+      statusDiv.textContent = 'Processing image with @imgly...';
+
+      const blob = await removeBackground('assets/sample_photo.jpg', {
+        progress: (key, current, total) => {
+          statusDiv.textContent = `Processing: ${key} (${Math.round((current/total)*100 || 0)}%)`;
+        }
+      });
+
+      resultImg.src = URL.createObjectURL(blob);
+      statusDiv.textContent = 'DONE! @imgly background removal successful!';
+      window.__IMGLY_DONE__ = true;
+    } catch (e) {
+      statusDiv.textContent = 'Error: ' + e.message;
+      console.error(e);
+      window.__IMGLY_ERROR__ = e.message;
+    }
+  </script>
+</body>
+</html>
